@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">TimeTools</string>
     <string name="title_main">Time Tools</string>
+    <string name="select_time_msg">select timezone from the left side menu &#8230;</string>
+    <string name="local_time_placeholder">local time</string>
+    <string name="local_time_title">Local Time</string>
 </resources>

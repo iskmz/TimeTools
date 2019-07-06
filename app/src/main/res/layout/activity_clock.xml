@@ -8,8 +8,92 @@
         xmlns:android="http://schemas.android.com/apk/res/android">
 
 
-    <TextView android:layout_width="match_parent" android:layout_height="match_parent"
-              android:text="CLOCK" android:gravity="center"/>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
+        android:orientation="vertical" android:layout_weight="2" android:layout_margin="16dp">
+
+
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/local_time_title"
+                    android:textColor="#A0D365"
+                    android:textSize="20sp"
+                    android:gravity="start"
+                    android:textStyle="italic"/>
+
+
+            <TextView
+                    android:id="@+id/txtLocalTime"
+                    android:layout_width="match_parent" android:layout_height="match_parent"
+                    android:textColor="#ffffff" android:text="@string/local_time_placeholder" android:textSize="16sp"
+                    android:layout_marginTop="5dp"
+                    android:gravity="start"/>
+
+        </LinearLayout>
+
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="#665C5C"/>
+
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
+        android:layout_weight="1" android:orientation="horizontal"
+                  android:layout_marginStart="16dp" android:layout_marginEnd="16dp">
+
+
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
+            android:layout_weight="1" android:orientation="vertical" android:layout_marginTop="10dp">
+
+                <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Timezones"
+                        android:textColor="#A0D365"
+                        android:textSize="20sp"
+                        android:gravity="start"
+                        android:textStyle="italic"/>
+
+
+
+                <ListView
+                        android:id="@+id/lstTimezones"
+                        android:layout_width="match_parent" android:layout_height="match_parent"
+                android:layout_marginEnd="5dp"
+                android:verticalScrollbarPosition="left"
+                android:scrollbarAlwaysDrawVerticalTrack="true"
+                android:fadeScrollbars="false"
+                android:scrollbarFadeDuration="0"
+                android:scrollbars="vertical">
+
+                </ListView>
+
+            </LinearLayout>
+
+        <LinearLayout
+                android:layout_width="2dp"
+                android:layout_height="match_parent"
+                android:background="#665C5C"/>
+
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
+                          android:layout_weight="1" android:orientation="vertical"
+                      android:layout_marginTop="10dp">
+
+            <TextView
+                    android:id="@+id/txtSelectTime"
+                    android:layout_width="match_parent" android:layout_height="match_parent"
+                    android:textColor="#ffffff"  android:text="@string/select_time_msg"
+                    android:textStyle="italic" android:textSize="16sp"
+                    android:layout_marginTop="5dp" android:layout_marginStart="5dp"
+                    android:gravity="start"/>
+
+            </LinearLayout>
+
+
+        </LinearLayout>
 
 
 
