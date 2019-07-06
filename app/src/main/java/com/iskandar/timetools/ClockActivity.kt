@@ -6,44 +6,33 @@ import android.os.Bundle
 class ClockActivity : AppCompatActivity() {
 
 
-    val localTimeStr = "http://worldtimeapi.org/api/ip"
+    val localTimeURL = "http://worldtimeapi.org/api/ip"
+    val timezonesURL = "http://worldtimeapi.org/api/timezone"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_clock)
 
-        loadLocalTime()
-        loadTimezones()
+        //loadLocalTime()
+        //loadTimezones()
     }
 
 
     private fun loadLocalTime() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
     }
 
+    /*
+    {"week_number":27,"utc_offset":"+03:00","utc_datetime":"2019-07-06T20:22:12.351816+00:00","unixtime":1562444532,"timezone":"Asia/Jerusalem","raw_offset":7200,"dst_until":"2019-10-26T23:00:00+00:00","dst_offset":3600,"dst_from":"2019-03-29T00:00:00+00:00","dst":true,"day_of_year":187,"day_of_week":6,"datetime":"2019-07-06T23:22:12.351816+03:00","client_ip":"85.130.211.80","abbreviation":"IDT"}
+     */
+
     private fun loadTimezones() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
     }
 }
 
 
 /*
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_weather);
-
-        setPointer();
-
-        setWeatherURL("En"); // "English is default" for now //
-        getDataJSON();
-    }
-
-    private void setWeatherURL(String langCode) {
-        for(String city: cityNames)
-            myWeather.add(new ClsWeather(city,UtilsWeather.buildWeatherURL(city,langCode),context));
-    }
 
 
     @SuppressLint("StaticFieldLeak")
