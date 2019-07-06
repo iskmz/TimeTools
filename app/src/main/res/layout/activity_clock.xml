@@ -4,6 +4,7 @@
         android:orientation="vertical"
         android:layoutDirection="ltr"
         android:textDirection="ltr"
+        android:background="@drawable/back_clock"
         xmlns:android="http://schemas.android.com/apk/res/android">
 
 

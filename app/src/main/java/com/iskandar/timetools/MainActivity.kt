@@ -4,6 +4,7 @@ import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
+import android.view.View
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -35,6 +36,11 @@ class MainActivity : AppCompatActivity() {
             .setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
             .create()
         info.setCanceledOnTouchOutside(false)
+        // force LTR //
+        info.window?.let{
+            it.decorView.textDirection = View.TEXT_DIRECTION_LTR
+            it.decorView.layoutDirection = View.LAYOUT_DIRECTION_LTR
+        }
         info.show()
     }
 }
