@@ -6,7 +6,13 @@ import android.net.ConnectivityManager
 import android.os.AsyncTask
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AlertDialog
+import android.view.View
+import android.widget.Adapter
+import android.widget.ArrayAdapter
+import android.widget.ListAdapter
 import kotlinx.android.synthetic.main.activity_clock.*
+import org.json.JSONArray
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.InputStream
@@ -23,12 +29,84 @@ class ClockActivity : AppCompatActivity() {
     val localTimeURL = "http://worldtimeapi.org/api/ip"
     val timezonesURL = "http://worldtimeapi.org/api/timezone"
 
+    val zoneList = mutableListOf<String>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_clock)
 
+        if(!hasInternet()) checkInternetDialog()
         loadLocalTime()
-        //loadTimezones()
+        loadTimezones()
+        setListeners()
+    }
+
+    private fun setListeners() {
+        lstTimezones.setOnItemClickListener {
+                _, _, pos, _ -> loadTimeZoneData(pos) }
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    private fun loadTimeZoneData(pos: Int) {
+
+        if (zoneList.isEmpty()) return  // do nothing
+
+        var time:LocalTime? = null
+        val zoneURL = "$timezonesURL/${zoneList[pos]}"
+
+        object : AsyncTask<Void, Void, String>() {
+
+            override fun doInBackground(vararg params: Void?): String? {
+
+                // check for Internet connection first ! //
+                if(!hasInternet()) return null
+
+                // get JSON data
+                val inSt = URL(zoneURL).content as InputStream
+                return inSt.bufferedReader().use { it.readText() }
+            }
+
+            override fun onPostExecute(result: String?) {
+                super.onPostExecute(result)
+
+                // parse JSON data // if NOT null
+                result?.let{
+                    val jsonObj = JSONObject(it)
+                    time = LocalTime(
+                        jsonObj.getString("timezone"),
+                        jsonObj.getString("abbreviation"),
+                        jsonObj.getString("datetime").split("T")[0],
+                        jsonObj.getString("datetime").split("T")[1].split(".")[0],
+                        jsonObj.getString("utc_offset")
+                    )
+                }
+
+                // set TextView with new data // if localTime NOT null
+                time?.let{
+                    txtSelectTime.text = StringBuilder("timezone:-\n\t${it.timezone}\n\t${it.abbr}" +
+                            "\n\ndate:-\n\t${it.date}\n\ntime:-\n\t${it.time}\n\t${it.utc_offset}")
+                }
+            }
+
+        }.execute()
+
+    }
+
+    private fun checkInternetDialog() {
+        val checkNet = AlertDialog.Builder(context)
+            .setTitle("NO INTERNET !")
+            .setMessage("internet connection is needed to load time data!")
+            .setIcon(R.drawable.ic_warning_red)
+            .setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
+            .setNegativeButton("Back to Main") { _ , _ -> finish() }
+            .create()
+        checkNet.setCanceledOnTouchOutside(false)
+        // force LTR //
+        checkNet.window?.let{
+            it.decorView.textDirection = View.TEXT_DIRECTION_LTR
+            it.decorView.layoutDirection = View.LAYOUT_DIRECTION_LTR
+        }
+        checkNet.show()
     }
 
     @SuppressLint("StaticFieldLeak")
@@ -71,8 +149,6 @@ class ClockActivity : AppCompatActivity() {
             }
 
         }.execute()
-
-
     }
 
     /*
@@ -80,8 +156,39 @@ class ClockActivity : AppCompatActivity() {
     {"week_number":27,"utc_offset":"+03:00","utc_datetime":"2019-07-06T20:22:12.351816+00:00","unixtime":1562444532,"timezone":"Asia/Jerusalem","raw_offset":7200,"dst_until":"2019-10-26T23:00:00+00:00","dst_offset":3600,"dst_from":"2019-03-29T00:00:00+00:00","dst":true,"day_of_year":187,"day_of_week":6,"datetime":"2019-07-06T23:22:12.351816+03:00","client_ip":"85.130.211.80","abbreviation":"IDT"}
      */
 
+    @SuppressLint("StaticFieldLeak")
     private fun loadTimezones() {
 
+        object : AsyncTask<Void, Void, String>() {
+
+            override fun doInBackground(vararg params: Void?): String? {
+
+                // check for Internet connection first ! //
+                if(!hasInternet()) return null
+
+                // get JSON data
+                val inSt = URL(timezonesURL).content as InputStream
+                return inSt.bufferedReader().use { it.readText() }
+            }
+
+            override fun onPostExecute(result: String?) {
+                super.onPostExecute(result)
+
+                // parse JSON data // if NOT null
+                result?.let{
+                    val jsonArr = JSONArray(it)
+                    for (i in 0 until jsonArr.length()){
+                        zoneList.add(jsonArr.get(i).toString())
+                    }
+                }
+
+                // set LIST-ITEMS with new data // if zoneList is Not EMPTY // ADAPTER //
+                if (zoneList.isNotEmpty()){
+                   lstTimezones.adapter = ArrayAdapter(context,android.R.layout.simple_list_item_1,zoneList)
+                }
+            }
+
+        }.execute()
     }
 
 
@@ -91,4 +198,5 @@ class ClockActivity : AppCompatActivity() {
         val netInfo = conMgr.activeNetworkInfo
         return netInfo != null && netInfo.isConnected
     }
+
 }
