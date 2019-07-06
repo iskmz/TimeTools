@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">TimeTools</string>
+    <string name="title_main">Time Tools</string>
 </resources>

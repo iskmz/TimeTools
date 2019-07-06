@@ -1,18 +1,99 @@
-<?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".MainActivity">
+<LinearLayout
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:background="@drawable/back_main"
+        android:layoutDirection="ltr"
+        android:textDirection="ltr"
+        xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
-</android.support.constraint.ConstraintLayout>
+        <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="16dp"
+                xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+                <TextView
+                        android:id="@+id/txtTitleMain"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:textColor="#ffffff"
+                    android:text="@string/title_main"
+                    android:textSize="30sp" android:textStyle="bold" android:fontFamily="serif"
+                    android:gravity="center"
+                    android:layout_alignParentTop="true"
+                    android:layout_centerHorizontal="true"/>
+
+                <ImageButton
+                        android:id="@+id/btnStopwatch"
+                        android:src="@drawable/ic_stopwatch"
+                        android:scaleType="fitXY"
+                        android:background="#FFC107"
+                        android:padding="15dp"
+                        android:layout_width="150dp" android:layout_height="150dp"
+                android:layout_below="@id/txtTitleMain" android:layout_marginTop="50dp"
+                android:layout_marginStart="25dp" android:layout_alignParentStart="true"/>
+
+
+                <ImageButton
+                        android:id="@+id/btnClocks"
+                        android:src="@drawable/ic_clock"
+                        android:scaleType="fitXY"
+                        android:padding="15dp"
+                        android:background="#A0D365"
+                        android:layout_width="150dp" android:layout_height="150dp"
+                        android:layout_below="@id/txtTitleMain" android:layout_toEndOf="@id/btnStopwatch"
+                        android:layout_marginTop="50dp"
+                        android:layout_marginStart="15dp"/>
+
+
+                <ImageButton
+                        android:id="@+id/btnCountdown"
+                        android:src="@drawable/ic_countdown"
+                        android:scaleType="fitXY"
+                        android:padding="15dp"
+                        android:background="#1783D6"
+                        android:layout_width="150dp" android:layout_height="150dp"
+                        android:layout_below="@id/btnStopwatch" android:layout_marginTop="15dp"
+                        android:layout_marginStart="25dp" android:layout_alignParentStart="true"/>
+
+
+                <ImageButton
+                        android:id="@+id/btnAlarm"
+                        android:src="@drawable/ic_alarm"
+                        android:scaleType="fitXY"
+                        android:padding="15dp"
+                        android:background="#F83C01"
+                        android:layout_width="150dp" android:layout_height="150dp"
+                        android:layout_below="@id/btnClocks" android:layout_toEndOf="@id/btnCountdown"
+                        android:layout_marginTop="15dp"
+                        android:layout_marginStart="15dp"/>
+
+
+
+            <ImageButton
+                    android:id="@+id/btnInfo"
+                    android:background="@drawable/ic_info"
+                    android:backgroundTint="#F88F00"
+                    android:layout_width="50dp" android:layout_height="50dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginBottom="20dp"/>
+
+
+            <ImageButton
+                    android:id="@+id/btnQuit"
+                    android:background="@drawable/ic_exit"
+                    android:backgroundTint="#FA0000"
+                    android:layout_width="50dp" android:layout_height="50dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginEnd="20dp"/>
+
+        </RelativeLayout>
+
+
+
+</LinearLayout>
