@@ -1,17 +1,115 @@
 package com.iskandar.timetools
 
+import android.annotation.SuppressLint
+import android.content.Context
+import android.os.AsyncTask
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.os.SystemClock
+import kotlinx.android.synthetic.main.activity_stopwatch.*
 
 class StopwatchActivity : AppCompatActivity() {
+
+
+    val  TICK_TIME_MSEC = TimeDisplayMSec.MSEC_EIGHTH_TICK
+
+    var stopwatch = TimeDisplayMSec(TICK_TIME_MSEC)
+    var lapsCounter = 0
+    var playON = false
+    var cancelAndRestart = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_stopwatch)
+
+        setListeners()
     }
+
+    private fun setListeners() {
+
+        btnStopwatchPlayPause.setOnClickListener {
+            playON = !playON
+            cancelAndRestart = false
+            btnStopwatchPlayPause
+                .setImageResource(if (playON) R.drawable.ic_stopwatch_pause else R.drawable.ic_stopwatch_play)
+            playPause()
+        }
+
+        btnStopwatchFlag.setOnClickListener {
+                if(stopwatch != TimeDisplayMSec(TICK_TIME_MSEC)){
+                    lapsCounter+=1
+                    val previous = txtStopwatchLaps.text.toString()
+                    txtStopwatchLaps.text = StringBuilder(lapsCounter.toString()
+                            + " " + stopwatch.toString() + "\n" + previous)
+                }
+        }
+
+        btnStopwatchRestart.setOnClickListener {
+            // CANCEL & RESTART option in postExecute //
+            cancelAndRestart = true
+            // in case clicked when PAUSED
+            // i.e. no access to AsyncTask above ! ~ playOn=false //
+            clearAllTimeFields()
+            btnStopwatchPlayPause.setImageResource(R.drawable.ic_stopwatch_play)
+        }
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    private fun playPause() {
+
+        if(playON && !cancelAndRestart){
+            object : AsyncTask<TimeDisplayMSec,TimeDisplayMSec,TimeDisplayMSec>(){
+                override fun doInBackground(vararg params: TimeDisplayMSec?): TimeDisplayMSec {
+                    while (true) {
+                        SystemClock.sleep(TICK_TIME_MSEC.toLong())
+                        stopwatch.tick()
+                        publishProgress(stopwatch)
+
+                        // both of the following lines , will direct to postExecute
+                        // for different tasks ! // one for RESET & one for PAUSE //
+                        if (cancelAndRestart) break
+                        if (!playON) break
+                    }
+
+                    return stopwatch
+                }
+
+                override fun onPostExecute(timeDisplay: TimeDisplayMSec) {
+                    if (!cancelAndRestart) { // on PAUSE //
+                        val tmp = TimeDisplayMSec(timeDisplay)
+                        stopwatch = tmp // to keep time record when paused //
+
+                    } else
+                    // on CANCEL & RESTART //
+                    {
+                        clearAllTimeFields()
+                    }
+                    // reset value of booleans
+                    cancelAndRestart = false // make sure it become TRUE on next RESTART click //
+                    playON = false // to make sure it becomes TRUE on next PLAY click //
+                }
+
+                override fun onProgressUpdate(vararg values: TimeDisplayMSec) {
+                    if (!cancelAndRestart) {
+                        txtStopwatchTime.text =  values[0].toString()
+                    }
+                }
+
+            }.execute(stopwatch)
+        }
+    }
+
+    private fun clearAllTimeFields() {
+        // clear values
+        stopwatch = TimeDisplayMSec(TICK_TIME_MSEC)
+        lapsCounter = 0
+        // clear fields
+        txtStopwatchLaps.text = ""
+        txtStopwatchTime.text = "00:00:00"
+    }
+
+
 }
-
-
 
 
 open class TimeDisplay(var sec: Int, var min: Int, var hour: Int) {

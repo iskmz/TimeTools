@@ -4,7 +4,7 @@
         android:orientation="vertical"
         android:layoutDirection="ltr"
         android:textDirection="ltr"
-        android:background="@drawable/back_countdown"
+        android:background="#000000"
         xmlns:android="http://schemas.android.com/apk/res/android">
 
 
