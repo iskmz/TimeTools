@@ -7,6 +7,7 @@ import android.os.AsyncTask
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
+import android.util.Log
 import android.view.View
 import android.widget.Adapter
 import android.widget.ArrayAdapter
@@ -15,6 +16,7 @@ import kotlinx.android.synthetic.main.activity_clock.*
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.BufferedReader
+import java.io.FileNotFoundException
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
@@ -44,6 +46,16 @@ class ClockActivity : AppCompatActivity() {
     private fun setListeners() {
         lstTimezones.setOnItemClickListener {
                 _, _, pos, _ -> loadTimeZoneData(pos) }
+
+        btnClocksRefresh.setOnClickListener {
+            if(!hasInternet()) checkInternetDialog()
+            // reset text views
+            txtLocalTime.text = getString(R.string.local_time_placeholder)
+            txtSelectTime.text = getString(R.string.select_time_msg)
+            // re-load data
+            loadLocalTime()
+            loadTimezones()
+        }
     }
 
     @SuppressLint("StaticFieldLeak")
@@ -62,8 +74,13 @@ class ClockActivity : AppCompatActivity() {
                 if(!hasInternet()) return null
 
                 // get JSON data
-                val inSt = URL(zoneURL).content as InputStream
-                return inSt.bufferedReader().use { it.readText() }
+                return try {
+                    val inSt = URL(zoneURL).content as InputStream
+                    inSt.bufferedReader().use { it.readText() }
+                } catch (e:FileNotFoundException){
+                    Log.e("ERR", "File Not Found Exception @ doInBack. @ loadTimeZoneData()")
+                    null
+                }
             }
 
             override fun onPostExecute(result: String?) {
@@ -122,8 +139,13 @@ class ClockActivity : AppCompatActivity() {
                 if(!hasInternet()) return null
 
                 // get JSON data
-                val inSt = URL(localTimeURL).content as InputStream
-                return inSt.bufferedReader().use { it.readText() }
+                return try {
+                    val inSt = URL(localTimeURL).content as InputStream
+                    inSt.bufferedReader().use { it.readText() }
+                } catch (e:FileNotFoundException){
+                    Log.e("ERR", "File Not Found Exception @ doInBack. @ loadLocalTime()")
+                    null
+                }
             }
 
             override fun onPostExecute(result: String?) {
@@ -167,8 +189,13 @@ class ClockActivity : AppCompatActivity() {
                 if(!hasInternet()) return null
 
                 // get JSON data
-                val inSt = URL(timezonesURL).content as InputStream
-                return inSt.bufferedReader().use { it.readText() }
+                return try {
+                    val inSt = URL(timezonesURL).content as InputStream
+                    inSt.bufferedReader().use { it.readText() }
+                } catch (e:FileNotFoundException){
+                    Log.e("ERR", "File Not Found Exception @ doInBack. @ loadTimezones()")
+                    null
+                }
             }
 
             override fun onPostExecute(result: String?) {
