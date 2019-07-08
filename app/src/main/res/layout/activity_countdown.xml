@@ -1,16 +1,125 @@
 <LinearLayout
-        android:layout_height="match_parent"
         android:layout_width="match_parent"
-        android:orientation="vertical"
+        android:layout_height="match_parent"
         android:layoutDirection="ltr"
         android:textDirection="ltr"
         android:background="#000000"
+        android:orientation="vertical"
         xmlns:android="http://schemas.android.com/apk/res/android">
 
+        <RelativeLayout
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:orientation="vertical"
+                android:layout_margin="16dp">
 
-    <TextView android:layout_width="match_parent" android:layout_height="match_parent"
-              android:text="COUNTDOWN" android:gravity="center"/>
+
+            <TextView
+                    android:id="@+id/txtCountdownTitle"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/countdown_timer_title"
+                    android:layout_centerHorizontal="true"
+                    android:textSize="30sp"
+                    android:layout_alignParentTop="true"
+                    android:textColor="#1783D6"/>
+
+            <TextView
+                    android:id="@+id/txtCountdown"
+                    android:layout_below="@id/txtCountdownTitle"
+                    android:layout_centerHorizontal="true"
+                    android:layout_above="@id/layNumPickers"
+                    android:text="@string/countdown_placeholder"
+                    android:textSize="30sp" android:textColor="#ffffff" android:gravity="center"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"/>
 
 
+            <RelativeLayout
+                        android:id="@+id/layNumPickers"
+                        android:layout_centerInParent="true"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="10dp"
+                          android:layout_width="match_parent" android:layout_height="wrap_content"
+                          android:orientation="horizontal">
+
+                <NumberPicker
+                        android:id="@+id/pickerMinutes"
+                        android:layout_centerInParent="true"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+
+                <TextView
+                            android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:layout_below="@id/pickerMinutes"
+                            android:layout_alignStart="@id/pickerMinutes"
+                            android:layout_alignEnd="@id/pickerMinutes"
+                            android:gravity="center"
+                            android:layout_marginTop="10dp" android:text="minutes"
+                            android:textStyle="bold"
+                            android:textSize="16sp"/>
+
+
+                <NumberPicker
+                        android:id="@+id/pickerHours"
+                        android:layout_toStartOf="@id/pickerMinutes"
+                        android:layout_centerVertical="true"
+                        android:layout_marginEnd="25dp"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+
+                <TextView
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:layout_below="@id/pickerHours"
+                        android:layout_alignStart="@id/pickerHours"
+                        android:layout_alignEnd="@id/pickerHours"
+                        android:gravity="center"
+                        android:layout_marginTop="10dp" android:text="hours"
+                        android:textStyle="bold"
+                        android:textSize="16sp"/>
+
+
+
+                <NumberPicker
+                        android:id="@+id/pickerSeconds"
+                        android:layout_toEndOf="@id/pickerMinutes"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="25dp"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+
+                <TextView
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:layout_below="@id/pickerSeconds"
+                        android:layout_alignStart="@id/pickerSeconds"
+                        android:layout_alignEnd="@id/pickerSeconds"
+                        android:gravity="center"
+                        android:layout_marginTop="10dp" android:text="seconds"
+                        android:textStyle="bold"
+                        android:textSize="16sp"/>
+
+
+            </RelativeLayout>
+
+            <ImageButton
+                    android:layout_width="75dp"
+                    android:layout_height="75dp"
+                    android:src="@drawable/ic_stopwatch_play"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginBottom="10dp"
+                    android:scaleType="fitXY"
+                    android:background="#1783D6"
+                    android:id="@+id/btnCountdownStart"/>
+
+            <ImageButton
+                    android:layout_width="75dp"
+                    android:layout_height="75dp"
+                    android:src="@drawable/ic_stopwatch_reset"
+                    android:layout_toStartOf="@id/btnCountdownStart"
+                    android:layout_marginEnd="20dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginBottom="10dp"
+                    android:scaleType="fitXY"
+                    android:background="#1931B4"
+                    android:layout_marginStart="20dp"
+                    android:id="@+id/btnCountdownReset"/>
+
+        </RelativeLayout>
 
 </LinearLayout>
