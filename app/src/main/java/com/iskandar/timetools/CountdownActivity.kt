@@ -44,7 +44,9 @@ class CountdownActivity : AppCompatActivity() {
 
     private fun initialize() {
         timeCountdown = TimeCountdown()
-        countdownService = CountdownService(timeCountdown,txtCountdown)
+        // countdownService = CountdownService(timeCountdown,txtCountdown)
+        //countdownService = CountdownService()
+        // countdownService.setTxtViewRef(txtCountdown)
         setNumberPickers()
         setButtons()
     }
@@ -68,7 +70,7 @@ class CountdownActivity : AppCompatActivity() {
 
     private fun setButtons() {
         btnCountdownReset.setOnClickListener {
-            countdownService.stopSelf()
+            stopService(Intent(context,CountdownService::class.java))
             setNumberPickers()
             txtCountdown.text = getString(R.string.countdown_placeholder)
             btnCountdownStart.setImageResource(R.drawable.ic_stopwatch_play)
@@ -161,16 +163,20 @@ class TimeCountdown(var sec: Int, var min: Int, var hour: Int) {
 class CountdownService : Service {
     private val startTime: TimeCountdown
     private var tv:TextView? = null
+    private var isServiceOn = false
 
     private lateinit var currentTime:TimeCountdown
 
-    constructor(startTime: TimeCountdown, txtV:TextView?) : super() {
+    private constructor(startTime: TimeCountdown, txtV:TextView?) : super() {
         this.startTime = startTime
         this.tv = txtV
     }
 
     constructor() : this(TimeCountdown(0,0,0),null) // default c'tor for the service
 
+    fun setTxtViewRef(txtV:TextView){
+        this.tv = txtV
+    }
 
     val ONE_SECOND = 1000
 
@@ -193,6 +199,7 @@ class CountdownService : Service {
 
             currentTime = TimeCountdown(seconds,minutes,hours)
 
+            isServiceOn=true
             resumeCountdown(currentTime)
         }
 
@@ -206,7 +213,7 @@ class CountdownService : Service {
         object : AsyncTask<TimeCountdown,TimeCountdown,TimeCountdown>(){
             override fun doInBackground(vararg params: TimeCountdown): TimeCountdown {
 
-                while(params[0] != TimeCountdown(0,0,0)){
+                while(isServiceOn && params[0] != TimeCountdown(0,0,0)){
                     SystemClock.sleep(ONE_SECOND.toLong())
                     currentTime.tickDown()
                     publishProgress(currentTime)
@@ -218,13 +225,13 @@ class CountdownService : Service {
             }
 
             override fun onProgressUpdate(vararg values: TimeCountdown) {
-                Log.e("is tv null again?", (tv==null).toString())
+                Log.e("is tv null again?", (tv==null).toString()) // NULL !  WHY ?!?!?! //
                 tv?.let{ it.text = values[0].toString() }
             }
 
             override fun onPostExecute(result: TimeCountdown) {
-                tv?.let{ it.text = result.toString() }
-                playTune()
+                    tv?.let { it.text = result.toString() }
+                    if (isServiceOn) playTune()
             }
 
             private fun playTune() {
@@ -241,7 +248,8 @@ class CountdownService : Service {
     }
 
     override fun onDestroy() {
-        tv?.let{ it.text = currentTime.toString() }
+        isServiceOn = false
+        tv = null
     }
 
 
