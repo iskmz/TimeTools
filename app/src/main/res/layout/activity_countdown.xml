@@ -44,6 +44,7 @@
                 <NumberPicker
                         android:id="@+id/pickerMinutes"
                         android:layout_centerInParent="true"
+                        android:theme="@style/NumberPickerStyle"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"/>
 
                 <TextView
@@ -61,6 +62,7 @@
                         android:id="@+id/pickerHours"
                         android:layout_toStartOf="@id/pickerMinutes"
                         android:layout_centerVertical="true"
+                        android:theme="@style/NumberPickerStyle"
                         android:layout_marginEnd="25dp"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"/>
 
@@ -80,6 +82,7 @@
                         android:id="@+id/pickerSeconds"
                         android:layout_toEndOf="@id/pickerMinutes"
                         android:layout_centerVertical="true"
+                        android:theme="@style/NumberPickerStyle"
                         android:layout_marginStart="25dp"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"/>
 
