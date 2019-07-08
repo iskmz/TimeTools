@@ -1,23 +1,33 @@
 package com.iskandar.timetools
 
+import android.annotation.SuppressLint
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.media.MediaPlayer
+import android.os.AsyncTask
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.os.IBinder
+import android.os.SystemClock
+import android.provider.MediaStore
+import android.util.Log
 import android.widget.EditText
 import android.widget.NumberPicker
+import android.widget.TextView
 import kotlinx.android.synthetic.main.activity_countdown.*
+import org.w3c.dom.Text
 
 class CountdownActivity : AppCompatActivity() {
 
 
     val HOURS_MAX_VALUE = 99
 
-    val HOURS = "h"
-    val MINUTES = "m"
-    val SECONDS = "s"
+    companion object {
+        val HOURS = "h"
+        val MINUTES = "m"
+        val SECONDS = "s"
+    }
 
     val context = this@CountdownActivity as Context
 
@@ -34,7 +44,7 @@ class CountdownActivity : AppCompatActivity() {
 
     private fun initialize() {
         timeCountdown = TimeCountdown()
-        countdownService = CountdownService(timeCountdown)
+        countdownService = CountdownService(timeCountdown,txtCountdown)
         setNumberPickers()
         setButtons()
     }
@@ -50,37 +60,60 @@ class CountdownActivity : AppCompatActivity() {
         pickerSeconds.minValue = 0
         pickerSeconds.maxValue = 59
 
+        // initial values //
+        pickerHours.value = 0
+        pickerMinutes.value = 0
+        pickerSeconds.value = 0
     }
 
     private fun setButtons() {
         btnCountdownReset.setOnClickListener {
+            countdownService.stopSelf()
+            setNumberPickers()
             txtCountdown.text = getString(R.string.countdown_placeholder)
+            btnCountdownStart.setImageResource(R.drawable.ic_stopwatch_play)
+            countdownOn = false
         }
 
         btnCountdownStart.setOnClickListener {
             if(countdownOn){
+                // STOP // PAUSE ! ... NOT RESET !! //
                 stopService(Intent(context,CountdownService::class.java))
                 countdownOn=false
+                btnCountdownStart.setImageResource(R.drawable.ic_stopwatch_play)
             }
             else{
-                // START / RESUME
+                // START / RESUME //
+                txtCountdown.text = getTimeFromPickers()
+                with(txtCountdown.text.split(":")){
+                    timeCountdown = TimeCountdown(this[2].toInt(),this[1].toInt(),this[0].toInt())
+                }
+
                 intent = Intent(context,CountdownService::class.java)
                 intent.putExtra(HOURS,timeCountdown.hour)
                 intent.putExtra(MINUTES,timeCountdown.min)
                 intent.putExtra(SECONDS,timeCountdown.sec)
-                startService(Intent(context,CountdownService::class.java))
+
+                startService(intent)
+
                 countdownOn=true
+                btnCountdownStart.setImageResource(R.drawable.ic_stopwatch_pause)
             }
 
         }
     }
+
+    private fun getTimeFromPickers(): CharSequence {
+        return TimeCountdown(pickerSeconds.value, pickerMinutes.value, pickerHours.value).toString()
+    }
 }
+
 
 
 class TimeCountdown(var sec: Int, var min: Int, var hour: Int) {
 
     constructor() : this(0, 0, 0)
-    constructor(other: TimeDisplay) : this(other.sec, other.min, other.hour)
+    constructor(other: TimeCountdown) : this(other.sec, other.min, other.hour)
 
     fun tickDown() {
         this.sec -= 1 // tick tock tick tock tick tock
@@ -104,7 +137,7 @@ class TimeCountdown(var sec: Int, var min: Int, var hour: Int) {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as TimeDisplay
+        other as TimeCountdown
 
         if (sec != other.sec) return false
         if (min != other.min) return false
@@ -123,22 +156,92 @@ class TimeCountdown(var sec: Int, var min: Int, var hour: Int) {
 
 }
 
-class CountdownService(val startTime:TimeCountdown) : Service() {
-    var currentTime:TimeCountdown = startTime
 
+
+class CountdownService : Service {
+    private val startTime: TimeCountdown
+    private var tv:TextView? = null
+
+    private lateinit var currentTime:TimeCountdown
+
+    constructor(startTime: TimeCountdown, txtV:TextView?) : super() {
+        this.startTime = startTime
+        this.tv = txtV
+    }
+
+    constructor() : this(TimeCountdown(0,0,0),null) // default c'tor for the service
+
+
+    val ONE_SECOND = 1000
 
     override fun onBind(intent: Intent?): IBinder? = null
 
+
     override fun onCreate() {
         super.onCreate()
+
+        currentTime = startTime
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        return super.onStartCommand(intent, flags, startId)
+
+        intent?.let{
+
+            val seconds = it.getIntExtra(CountdownActivity.SECONDS,0)
+            val minutes = it.getIntExtra(CountdownActivity.MINUTES,0)
+            val hours = it.getIntExtra(CountdownActivity.HOURS,0)
+
+            currentTime = TimeCountdown(seconds,minutes,hours)
+
+            resumeCountdown(currentTime)
+        }
+
+        return START_NOT_STICKY
+    }
+
+
+    @SuppressLint("StaticFieldLeak")
+    private fun resumeCountdown(currentTime: TimeCountdown) {
+
+        object : AsyncTask<TimeCountdown,TimeCountdown,TimeCountdown>(){
+            override fun doInBackground(vararg params: TimeCountdown): TimeCountdown {
+
+                while(params[0] != TimeCountdown(0,0,0)){
+                    SystemClock.sleep(ONE_SECOND.toLong())
+                    currentTime.tickDown()
+                    publishProgress(currentTime)
+
+                    Log.e("countdown: ",currentTime.toString()) // working ok ! //
+                }
+
+                return params[0]
+            }
+
+            override fun onProgressUpdate(vararg values: TimeCountdown) {
+                Log.e("is tv null again?", (tv==null).toString())
+                tv?.let{ it.text = values[0].toString() }
+            }
+
+            override fun onPostExecute(result: TimeCountdown) {
+                tv?.let{ it.text = result.toString() }
+                playTune()
+            }
+
+            private fun playTune() {
+                val mp = MediaPlayer.create(applicationContext,R.raw.countdown_done)
+                mp.start()
+
+                mp.setOnCompletionListener {
+                    mp.release()
+                    this@CountdownService.stopSelf()
+                }
+            }
+
+        }.execute(currentTime)
     }
 
     override fun onDestroy() {
-        super.onDestroy()
+        tv?.let{ it.text = currentTime.toString() }
     }
 
 
